@@ -6,6 +6,7 @@
 class TcpClient
 {
 public:
+  // TODO: Zmienic na static
   bool execute_request(std::string &addr, int port);
 };
 

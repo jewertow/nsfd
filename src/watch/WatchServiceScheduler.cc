@@ -15,12 +15,13 @@ void WatchServiceScheduler::schedule()
   while (supervisor->is_running())
   {
     execute();
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(15));
   }
 }
 
 void WatchServiceScheduler::execute()
 {
+  fprintf(stdout, "[INFO] scheduler executes tasks\n");
   storage->foreach([](WatchTask* task) -> void {
     // TODO: Wątek powinien byc dodawany do jakiejs mapy i ewentualnie ubijany
     std::thread t([&]() {

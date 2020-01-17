@@ -15,6 +15,10 @@ private:
 public:
   WatchServiceRequest(string& action, string& domain, string& port);
   ~WatchServiceRequest();
+
+  bool is_create_request();
+  string get_domain();
+  string get_port();
   string to_string();
 };
 

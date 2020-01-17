@@ -4,8 +4,8 @@
 #define GREEN_PREFIX "\033[32;1m"
 #define GREEN_SUFFIX "\033[0m"
 
-#define RED   "\x1B[31m"
-#define GRN   "\x1B[32m"
+#define RED   "\x1B[31;1m"
+#define GRN   "\x1B[32;1m"
 #define YEL   "\x1B[33m"
 #define BLU   "\x1B[34m"
 #define MAG   "\x1B[35m"

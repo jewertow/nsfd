@@ -5,7 +5,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <string.h>
-#include <arpa/inet.h>
+#include <unistd.h>
 
 bool TcpClient::execute_request(std::string &addr, int port)
 {
@@ -17,17 +17,18 @@ bool TcpClient::execute_request(std::string &addr, int port)
     return -1;
   }
 
+  struct timeval timeout{};
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+  setsockopt(socket_fd, SOL_SOCKET, SO_SNDTIMEO, (char*) &timeout, sizeof(timeout));
+
+  // TODO: Zwolnic pamięć?
   struct hostent* host_entity;
   if ((host_entity = gethostbyname(addr.c_str())) == nullptr)
   {
     fprintf(stderr, "[ERROR] Could not resolve dns address %s\n", addr.c_str());
     return false;
   }
-
-//  struct hostent* ip = inet_ntoa(*(struct in_addr*) host_entity->h_addr);
-
-//  char ip[NI_MAXHOST];
-//  strcpy(ip, inet_ntoa(*(struct in_addr*) host_entity->h_addr));
 
   sockaddr_in server_addr{};
   server_addr.sin_family = AF_INET;
@@ -40,5 +41,11 @@ bool TcpClient::execute_request(std::string &addr, int port)
     fprintf(stderr, "Cannot connect to the server (%s:%i).\n", addr.c_str(), port);
     return false;
   }
+
+  if (close(socket_fd) > 0)
+  {
+    printf("[ERROR] Could not close socket %d.\n", socket_fd);
+  }
+
   return true;
 }

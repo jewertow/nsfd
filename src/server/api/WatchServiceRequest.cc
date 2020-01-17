@@ -7,6 +7,21 @@ WatchServiceRequest::WatchServiceRequest(string& action, string& domain, string&
 
 WatchServiceRequest::~WatchServiceRequest() = default;
 
+bool WatchServiceRequest::is_create_request()
+{
+  return action == "create";
+}
+
+string WatchServiceRequest::get_domain()
+{
+  return domain;
+}
+
+string WatchServiceRequest::get_port()
+{
+  return port;
+}
+
 string WatchServiceRequest::to_string()
 {
   stringstream ss;

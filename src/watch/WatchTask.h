@@ -14,7 +14,7 @@ private:
   int port;
 
 public:
-  WatchTask(IcmpClient*, TcpClient*, std::string& domain, int port);
+  WatchTask(IcmpClient*, TcpClient*, std::string domain, int port);
 
   void execute();
 };

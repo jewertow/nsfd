@@ -1,7 +1,7 @@
 #include "WatchTask.h"
 #include "../util/CmdColor.h"
 
-WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string& domain, int port)
+WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port)
   : icmp_client(icmp_client), tcp_client(tcp_client), domain(domain), port(port) {}
 
 void WatchTask::execute()
