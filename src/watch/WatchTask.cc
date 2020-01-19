@@ -6,6 +6,15 @@
 WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port)
   : icmp_client(icmp_client), tcp_client(tcp_client), domain(std::move(domain)), port(port) {}
 
+WatchTask::~WatchTask()
+{
+  for (auto& result : results)
+  {
+    delete result;
+  }
+  results.clear();
+}
+
 WatchTaskResult* WatchTask::_execute()
 {
   auto* watch_task_result = new WatchTaskResult{};

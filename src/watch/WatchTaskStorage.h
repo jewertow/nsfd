@@ -12,6 +12,7 @@ private:
 
 public:
   WatchTaskStorage() = default;
+  ~WatchTaskStorage();
   void add_task(WatchTask*);
   void foreach(const std::function<void(WatchTask*)>& executor);
 };

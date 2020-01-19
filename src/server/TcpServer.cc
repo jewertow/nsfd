@@ -1,20 +1,13 @@
 #include "TcpServer.h"
-#include <unistd.h>
 
 TcpServer::TcpServer(int port, ServerSupervisor* supervisor)
   : port(port), supervisor(supervisor)
 {
-//  srv_thread = new thread([&]() { start(); });
-//  srv_thread->detach();
-  thread srv_thread([&]() { start(); });
-  srv_thread.detach();
+  thread t(&TcpServer::start, this);
+  t.detach();
 }
 
-TcpServer::~TcpServer()
-{
-//  close(srv_sock_fd);
-//  delete srv_thread;
-}
+TcpServer::~TcpServer() = default;
 
 void TcpServer::start()
 {
@@ -43,8 +36,6 @@ void TcpServer::process_connections(sockaddr_in& client_addr, socklen_t& sock_si
   inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
   printf("[DEBUG] Client ip %s. Socket desc: %d\n", client_ip, client_sock_fd);
 
-//  thread t([&]() { on_connection(client_sock_fd, client_ip); });
-//  t.detach();
   thread t(&TcpServer::on_connection, this, client_sock_fd, client_ip);
   t.detach();
 }

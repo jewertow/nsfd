@@ -15,7 +15,6 @@ class TcpServer
 protected:
   int port;
   ServerSupervisor* supervisor;
-//  thread* srv_thread;
   int srv_sock_fd;
 
   virtual void on_connection(int client_sock_fd, const std::string& client_addr) = 0;
