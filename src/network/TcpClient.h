@@ -3,11 +3,19 @@
 
 #include <string>
 
+struct TcpResult
+{
+  bool success;
+  long double time;
+};
+
+// TODO: Metody zmienic na static
 class TcpClient
 {
+private:
+  TcpResult* failed_result();
 public:
-  // TODO: Zmienic na static
-  bool execute_request(std::string &addr, int port);
+  TcpResult* execute_request(std::string &addr, int port);
 };
 
 #endif // NSFD_NETWORK_TCPCLIENT_H_

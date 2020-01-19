@@ -9,6 +9,7 @@ void WatchTaskStorage::foreach(const std::function<void (WatchTask *)>& executor
 {
   for (auto const& task : tasks)
   {
+    printf("[DEBUG] Executing task for domain: %s\n", task->domain.c_str());
     executor(task);
   }
 }

@@ -14,6 +14,7 @@
 #define NSFD_ICMP_RECV_TIMEOUT 1
 
 #define NSFD_ICMP_REQ_RETRIES 10
+#define NSFD_ICMP_BACKOFF_TIME_S 1
 
 // ping packet structure
 struct icmp_packet_t
@@ -22,17 +23,24 @@ struct icmp_packet_t
   char msg[NSFD_ICMP_PKT_SIZE - sizeof(struct icmphdr)];
 };
 
+struct IcmpResult
+{
+  bool success;
+  long double rtt_ms;
+};
+
 class IcmpClient
 {
 private:
   unsigned short checksum(void* bytes, int length);
-  bool send_ping(int raw_sock_fd, struct sockaddr_in* ping_addr, char* ping_dom, char* ping_ip, char* rev_host);
+  IcmpResult* send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host);
+  IcmpResult* failed_request();
 public:
   /**
    * Zwraca true jeśli udaje się nawiązać połączenie z hostem i false w przeciwnym wypadku.
    * Metoda loguje w konsoli informacje o połączeniu.
    */
-  bool execute_request(std::string &domain);
+  IcmpResult* execute_request(std::string &domain);
 };
 
 #endif // NSFD_ICMP_ICMPCLIENT_H_
