@@ -2,6 +2,7 @@
 #include "network/IcmpClient.h"
 #include "network/TcpClient.h"
 #include "watch/WatchServiceScheduler.h"
+#include "server/MetricsServer.h"
 #include <csignal>
 
 void stop(int);
@@ -26,6 +27,9 @@ int main(int argc, char *argv[])
 
   NsfdServer srv(5000, supervisor, &storage, &factory);
   srv.run();
+
+  MetricsServer metrics_server(5001, supervisor, &storage);
+  metrics_server.run();
 
   WatchServiceScheduler scheduler(&storage, supervisor);
   scheduler.run();
