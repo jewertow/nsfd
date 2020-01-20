@@ -25,7 +25,10 @@ int main(int argc, char *argv[])
   WatchTaskStorage storage;
 
   NsfdServer srv(5000, supervisor, &storage, &factory);
-  WatchServiceScheduler(&storage, supervisor);
+  srv.run();
+
+  WatchServiceScheduler scheduler(&storage, supervisor);
+  scheduler.run();
 
   string cmd;
   do {

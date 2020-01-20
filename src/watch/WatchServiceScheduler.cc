@@ -3,7 +3,9 @@
 #include <chrono>
 
 WatchServiceScheduler::WatchServiceScheduler(WatchTaskStorage* storage, ServerSupervisor* supervisor)
-  : storage(storage), supervisor(supervisor)
+  : storage(storage), supervisor(supervisor) {}
+
+void WatchServiceScheduler::run()
 {
   std::thread t(&WatchServiceScheduler::schedule, this);
   t.detach();
@@ -14,17 +16,11 @@ void WatchServiceScheduler::schedule()
 {
   while (supervisor->is_running())
   {
-    execute();
+    fprintf(stdout, "[INFO] executing tasks\n");
+    storage->foreach([](WatchTask* task) -> void {
+        std::thread t(&WatchTask::execute, task);
+        t.detach();
+    });
     std::this_thread::sleep_for(std::chrono::seconds(15));
   }
-}
-
-void WatchServiceScheduler::execute()
-{
-  // TODO: Przenieść to wszystko do pętli while
-  fprintf(stdout, "[INFO] scheduler executes tasks\n");
-  storage->foreach([](WatchTask* task) -> void {
-    std::thread t(&WatchTask::execute, task);
-    t.detach();
-  });
 }

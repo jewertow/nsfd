@@ -10,10 +10,11 @@ private:
   WatchTaskStorage* storage;
   ServerSupervisor* supervisor;
   void schedule();
-  void execute();
 
 public:
   WatchServiceScheduler(WatchTaskStorage*, ServerSupervisor*);
+  ~WatchServiceScheduler() = default;
+  void run();
 };
 
 #endif // NSFD_WATCH_WATCHSERVICESCHEDULER_H_

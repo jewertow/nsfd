@@ -1,13 +1,15 @@
 #include "TcpServer.h"
 
 TcpServer::TcpServer(int port, ServerSupervisor* supervisor)
-  : port(port), supervisor(supervisor)
+  : port(port), supervisor(supervisor) {}
+
+TcpServer::~TcpServer() = default;
+
+void TcpServer::run()
 {
   thread t(&TcpServer::start, this);
   t.detach();
 }
-
-TcpServer::~TcpServer() = default;
 
 void TcpServer::start()
 {
