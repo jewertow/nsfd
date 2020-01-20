@@ -22,6 +22,18 @@ void MetricsServer::process_request(int client_sock, const string& client_addr, 
 {
   auto* metrics_req = static_cast<MetricsRequest*>(request);
   printf("[DEBUG] Processing deserialized request:\n%s\n", metrics_req->domain.c_str());
+
+  auto* task = task_storage->get_by_domain(metrics_req->domain);
+  if (task != nullptr)
+  {
+    fprintf(stdout, "[INFO] Task %s results as string: %s\n", task->domain().c_str(), task->results_string().c_str());
+    Socket::write_and_close(client_sock, task->results_string());
+  }
+  else
+  {
+    fprintf(stdout, "[INFO] Task %s not found\n", metrics_req->domain.c_str());
+    Socket::write_and_close(client_sock, "NULL");
+  }
+
   delete metrics_req;
-  Socket::write_and_close(client_sock, "OK");
 }
