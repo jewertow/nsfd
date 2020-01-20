@@ -14,7 +14,7 @@ private:
 
 public:
   NsfdServer(int port, ServerSupervisor*, WatchTaskStorage*, WatchTaskFactory*);
-  ~NsfdServer();
+  ~NsfdServer() = default;
 
 protected:
   void on_connection(int client_sock, const string& client_addr) override;

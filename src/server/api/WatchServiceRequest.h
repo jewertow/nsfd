@@ -14,7 +14,7 @@ private:
 
 public:
   WatchServiceRequest(string& action, string& domain, string& port);
-  ~WatchServiceRequest();
+  ~WatchServiceRequest() = default;
 
   bool is_create_request() const;
   string domain() const;

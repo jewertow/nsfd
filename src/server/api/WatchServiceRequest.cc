@@ -5,8 +5,6 @@
 WatchServiceRequest::WatchServiceRequest(string& action, string& domain, string& port)
   : _action(action), _domain(domain), _port(port) {};
 
-WatchServiceRequest::~WatchServiceRequest() = default;
-
 bool WatchServiceRequest::is_create_request() const
 {
   return _action == "create";

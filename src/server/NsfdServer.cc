@@ -6,8 +6,6 @@
 NsfdServer::NsfdServer(int port, ServerSupervisor* supervisor, WatchTaskStorage* storage, WatchTaskFactory* factory)
   : TcpServer(port, supervisor), task_storage(storage), task_factory(factory) {}
 
-NsfdServer::~NsfdServer() = default;
-
 void NsfdServer::on_connection(int client_sock, const string& client_addr)
 {
   printf("[DEBUG] Client ip %s. Socket fd: %d\n", client_addr.c_str(), client_sock);

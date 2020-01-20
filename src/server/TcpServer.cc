@@ -3,8 +3,6 @@
 TcpServer::TcpServer(int port, ServerSupervisor* supervisor)
   : port(port), supervisor(supervisor) {}
 
-TcpServer::~TcpServer() = default;
-
 void TcpServer::run()
 {
   thread t(&TcpServer::start, this);
