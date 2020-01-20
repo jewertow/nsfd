@@ -25,4 +25,13 @@ add_executable(nsfd-server
 		src/network/dns.h
 		src/network/dns.cc
 		src/network/TcpClient.h
-		src/network/TcpClient.cc)
+		src/network/TcpClient.cc
+		src/watch/WatchTask.h
+		src/watch/WatchTask.cc
+		src/watch/WatchServiceScheduler.h
+		src/watch/WatchServiceScheduler.cc
+		src/watch/WatchTaskStorage.h
+		src/watch/WatchTaskStorage.cc
+		src/watch/WatchTaskFactory.h
+		src/watch/WatchTaskFactory.cc
+		src/util/CmdColor.h)

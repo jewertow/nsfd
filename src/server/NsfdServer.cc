@@ -3,10 +3,8 @@
 #include "api/WatchServiceRequest.h"
 #include "api/WatchServiceRequestDeserializer.h"
 
-NsfdServer::NsfdServer(int port, ServerSupervisor* supervisor)
-  : TcpServer(port, supervisor) {}
-
-NsfdServer::~NsfdServer() {}
+NsfdServer::NsfdServer(int port, ServerSupervisor* supervisor, WatchTaskStorage* storage, WatchTaskFactory* factory)
+  : TcpServer(port, supervisor), task_storage(storage), task_factory(factory) {}
 
 void NsfdServer::on_connection(int client_sock, const string& client_addr)
 {
@@ -25,7 +23,16 @@ void NsfdServer::process_request(int client_sock, const string& client_addr, voi
 {
   auto* watch_service_req = static_cast<WatchServiceRequest*>(request);
   printf("[DEBUG] Processing deserialized request:\n%s\n", watch_service_req->to_string().c_str());
-  delete watch_service_req;
 
+  if (watch_service_req->is_create_request())
+  {
+    fprintf(stdout, "[INFO] Dodanie zadania dla domeny %s i portu %s\n",
+            watch_service_req->domain().c_str(), watch_service_req->port().c_str());
+
+    auto* watch_task = task_factory->create_watch_task(watch_service_req);
+    task_storage->add_task(watch_task);
+  }
+
+  delete watch_service_req;
   Socket::write_and_close(client_sock, "OK");
 }

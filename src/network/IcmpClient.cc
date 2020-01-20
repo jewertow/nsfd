@@ -1,5 +1,6 @@
 #include "IcmpClient.h"
 #include "dns.h"
+#include "../util/CmdColor.h"
 
 #include <netinet/in.h>
 #include <string.h>
@@ -13,7 +14,7 @@
 #define NSFD_ICMP_NOT_SENT 0
 #define NSFD_ICMP_SENT 1
 
-bool IcmpClient::execute_request(std::string &domain)
+IcmpResult* IcmpClient::execute_request(const std::string& domain)
 {
   struct sockaddr_in addr_con{};
 
@@ -21,8 +22,7 @@ bool IcmpClient::execute_request(std::string &domain)
   if (ip_addr == nullptr)
   {
     printf("\nDNS lookup failed! Could not resolve hostname!\n");
-//    return NSFD_ICMP_DNS_LOOKUP_FAILED;
-    return false;
+    return this->failed_request();
   }
 
   char* hostname = reverse_dns(ip_addr);
@@ -32,8 +32,7 @@ bool IcmpClient::execute_request(std::string &domain)
   }
   else
   {
-//    return NSFD_ICMP_REQ_FAILED;
-    return false;
+    return this->failed_request();
   }
 
   printf("[DEBUG] Connecting to '%s' IP: %s\n", domain.c_str(), ip_addr);
@@ -41,60 +40,54 @@ bool IcmpClient::execute_request(std::string &domain)
   if (raw_sock_fd < 0)
   {
     printf("[ERROR] Could not create raw socket for domain %s\n", domain.c_str());
-//    return NSFD_ICMP_RAW_SOCK_CREATE_ERROR;
-    return false;
+    return this->failed_request();
   }
 
-  // send pings continuously
-  send_ping(raw_sock_fd, &addr_con, hostname, ip_addr, (char*) domain.c_str());
+  auto* icmp_result = send_icmp(raw_sock_fd, &addr_con, hostname, ip_addr, (char*) domain.c_str());
 
   free(hostname);
   free(ip_addr);
-
-//  return NSFD_ICMP_REQ_SUCCESS;
-  return true;
+  
+  return icmp_result;
 }
 
-bool IcmpClient::send_ping(int raw_sock_fd, struct sockaddr_in* ping_addr, char* ping_dom, char* ping_ip, char* rev_host)
+IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host)
 {
   int msg_count = 0;
   int msg_received_count = 0;
 
   struct icmp_packet_t packet{};
-  struct sockaddr_in r_addr{};
   struct timespec time_start{};
   struct timespec time_end{};
-  struct timespec tfs{};
-  struct timespec tfe{};
+  struct timespec total_time_start{};
+  struct timespec total_time_end{};
 
   long double total_msec = 0;
 
-  struct timeval tv_out{};
-  tv_out.tv_sec = NSFD_ICMP_RECV_TIMEOUT;
-  tv_out.tv_usec = 0;
+  struct timeval timeout{};
+  timeout.tv_sec = NSFD_ICMP_RECV_TIMEOUT;
+  timeout.tv_usec = 0;
 
-  clock_gettime(CLOCK_MONOTONIC, &tfs);
+  clock_gettime(CLOCK_MONOTONIC, &total_time_start);
 
   // SOL_IP - socket options level
-  // ustawienie ttl-a dla pakietu IP
-  int ttl_val = 64;
-  if (setsockopt(raw_sock_fd, SOL_IP, IP_TTL, &ttl_val, sizeof(ttl_val)) < 0)
+  int ttl = 64;
+  if (setsockopt(raw_sock_fd, SOL_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
   {
-    printf("[ERROR] Setting TTL failed\n");
-    // TODO: zwrócić odpowiedni status
-    return false;
+    fprintf(stdout, "[ERROR] Setting TTL failed\n");
+    return this->failed_request();
   }
 
   // setting timeout of recv setting
-  if (setsockopt(raw_sock_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*) &tv_out, sizeof tv_out) < 0)
+  if (setsockopt(raw_sock_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*) &timeout, sizeof timeout) < 0)
   {
-    printf("[ERROR] Setting socket timeout failed\n");
-    // TODO: zwrocic odpowieni status
-    return false;
+    fprintf(stdout, "[ERROR] Setting socket timeout failed\n");
+    return this->failed_request();
   }
 
-  int retries = NSFD_ICMP_REQ_RETRIES;
+  IcmpResult* result = nullptr;
 
+  int retries = NSFD_ICMP_REQ_RETRIES;
   int sent = NSFD_ICMP_NOT_SENT;
   while (retries > 0 && sent == NSFD_ICMP_NOT_SENT)
   {
@@ -106,33 +99,33 @@ bool IcmpClient::send_ping(int raw_sock_fd, struct sockaddr_in* ping_addr, char*
     packet.header.type = ICMP_ECHO;
     packet.header.un.echo.id = getpid();
 
-    int i;
-    for (i = 0; i < sizeof(packet.msg) - 1; i++)
+    // uzupelnienie tablicy msg losowymi danymi
+    for (int i = 0; i < sizeof(packet.msg); i++)
     {
       packet.msg[i] = i + '0';
     }
-    packet.msg[i] = 0;
 
     packet.header.un.echo.sequence = msg_count++;
-    // TODO: wykorzystać istniejącą funkcję do checksumy z in_cksum.h
+    // TODO: poszukać gotową funkcję do sumy kontrolnej np w in_cksum.h
     packet.header.checksum = this->checksum(&packet, sizeof(packet));
-
-    sleep(1);
 
     // send packet
     clock_gettime(CLOCK_MONOTONIC, &time_start);
-    if (sendto(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) ping_addr, sizeof(*ping_addr)) == -1)
+    if (sendto(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) dest_addr, sizeof(*dest_addr)) == -1)
     {
       printf("[ERROR] Could not send ICMP packet.\n");
       sent = NSFD_ICMP_NOT_SENT;
+      sleep(NSFD_ICMP_BACKOFF_TIME_S);
     }
     else
     {
       sent = NSFD_ICMP_SENT;
     }
 
-    int addr_len = sizeof(r_addr);
-    if (recvfrom(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*)&r_addr, (socklen_t*) &addr_len) <= 0 && msg_count > 1)
+    struct sockaddr_in src_addr{};
+    int addr_len = sizeof(src_addr);
+    ssize_t recv_res = recvfrom(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) &src_addr, (socklen_t*) &addr_len);
+    if (recv_res <= 0 && msg_count > 1)
     {
       printf("[ERROR] Could not receive packet.\n");
     }
@@ -141,37 +134,38 @@ bool IcmpClient::send_ping(int raw_sock_fd, struct sockaddr_in* ping_addr, char*
       clock_gettime(CLOCK_MONOTONIC, &time_end);
 
       double time = ((double) (time_end.tv_nsec - time_start.tv_nsec)) / 1000000.0;
-      long double rtt_msec = (time_end.tv_sec - time_start.tv_sec) * 1000.0 + time;
+      long double rtt_ms = (long double) (time_end.tv_sec - time_start.tv_sec) * 1000.0 + time;
+
+      result = new IcmpResult{};
+      result->success = true;
+      result->rtt_ms = rtt_ms;
 
       // if packet was not sent, don't receive
-      if (sent)
+      if (sent && recv_res)
       {
-        if(!(packet.header.type == 69 && packet.header.code == 0))
-        {
-          printf("Error..Packet received with ICMP type %d code %d\n", packet.header.type, packet.header.code);
-        }
-        else
-        {
-          printf("\033[32;1m%d bytes from %s (h: %s) (%s) msg_seq=%d ttl=%d rtt = %Lf ms.\n\033[0m",
-                 NSFD_ICMP_PKT_SIZE, ping_dom, rev_host, ping_ip, msg_count, ttl_val, rtt_msec);
-          msg_received_count++;
-        }
+        printf("\033[32;1m%d bytes from hostname: %s, domain name: (%s) ip: (%s) msg_seq=%d ttl=%d rtt = %Lf ms.\n\033[0m",
+               NSFD_ICMP_PKT_SIZE, hostname, rev_host, ping_ip, msg_count, ttl, rtt_ms);
+        msg_received_count++;
+      }
+      else
+      {
+        printf("%s[WARN] ICMP sent, not received%s\n", RED, RESET);
       }
     }
   }
 
   if (retries == 0 && sent == NSFD_ICMP_NOT_SENT)
-    return false;
+    return this->failed_request();
 
-  clock_gettime(CLOCK_MONOTONIC, &tfe);
-  double timeElapsed = ((double)(tfe.tv_nsec - tfs.tv_nsec))/1000000.0;
+  clock_gettime(CLOCK_MONOTONIC, &total_time_end);
+  double time_elapsed = ((double)(total_time_end.tv_nsec - total_time_start.tv_nsec)) / 1000000.0;
 
-  total_msec = (tfe.tv_sec - tfs.tv_sec) * 1000.0 + timeElapsed;
+  total_msec = (total_time_end.tv_sec - total_time_start.tv_sec) * 1000.0 + time_elapsed;
 
   printf("\033[32;1m%d packets sent, %d packets received, %f percent packet loss. Total time: %Lf ms.\n\033[0m",
          msg_count, msg_received_count, ((msg_count - msg_received_count)/msg_count) * 100.0, total_msec);
 
-  return true;
+  return result;
 }
 
 unsigned short IcmpClient::checksum(void* bytes, int len)
@@ -191,5 +185,9 @@ unsigned short IcmpClient::checksum(void* bytes, int len)
   return ~sum;
 }
 
-
-
+IcmpResult* IcmpClient::failed_request()
+{
+  auto* result = new IcmpResult{};
+  result->success = false;
+  return result;
+}
