@@ -16,6 +16,8 @@ class WatchTask
 private:
   IcmpClient* icmp_client;
   TcpClient* tcp_client;
+  const std::string _domain;
+  const int port;
 
   // TODO: Dostęp do wyników powinien być chroniony mutexem
   std::vector<WatchTaskResult*> results;
@@ -25,11 +27,10 @@ private:
 
 public:
   // TODO: Zmienić na const !!!
-  std::string domain;
-  int port;
   WatchTask(IcmpClient*, TcpClient*, std::string domain, int port);
   ~WatchTask();
-  // TODO: Dodać dekonstruktor zwalniający wektor
+
+  std::string domain() const;
 
   void execute();
   void print_results();

@@ -14,7 +14,7 @@
 #define NSFD_ICMP_NOT_SENT 0
 #define NSFD_ICMP_SENT 1
 
-IcmpResult* IcmpClient::execute_request(std::string &domain)
+IcmpResult* IcmpClient::execute_request(const std::string& domain)
 {
   struct sockaddr_in addr_con{};
 

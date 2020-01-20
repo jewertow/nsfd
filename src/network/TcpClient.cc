@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-TcpResult* TcpClient::execute_request(std::string &addr, int port)
+TcpResult* TcpClient::execute_request(const std::string& addr, int port)
 {
   int socket_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (socket_fd < 0)

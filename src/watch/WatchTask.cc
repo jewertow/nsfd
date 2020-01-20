@@ -4,7 +4,7 @@
 #include "../util/CmdColor.h"
 
 WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port)
-  : icmp_client(icmp_client), tcp_client(tcp_client), domain(std::move(domain)), port(port) {}
+  : icmp_client(icmp_client), tcp_client(tcp_client), _domain(std::move(domain)), port(port) {}
 
 WatchTask::~WatchTask()
 {
@@ -15,33 +15,38 @@ WatchTask::~WatchTask()
   results.clear();
 }
 
+std::string WatchTask::domain() const
+{
+  return _domain;
+}
+
 WatchTaskResult* WatchTask::_execute()
 {
   auto* watch_task_result = new WatchTaskResult{};
 
-  auto* icmp_result = icmp_client->execute_request(domain);
+  auto* icmp_result = icmp_client->execute_request(this->_domain);
   watch_task_result->icmp_result = icmp_result;
 
   if (icmp_result == nullptr || !icmp_result->success)
   {
-    fprintf(stdout, "%sICMP request to %s failed %s\n", RED, domain.c_str(), RESET);
+    fprintf(stdout, "%sICMP request to %s failed %s\n", RED, _domain.c_str(), RESET);
     watch_task_result->tcp_result = nullptr;
     return watch_task_result;
   }
   else
   {
-    fprintf(stdout, "%sICMP request to %s succeeded! %s\n", GRN, domain.c_str(), RESET);
+    fprintf(stdout, "%sICMP request to %s succeeded! %s\n", GRN, _domain.c_str(), RESET);
   }
 
-  auto* tcp_result = tcp_client->execute_request(domain, port);
+  auto* tcp_result = tcp_client->execute_request(_domain, port);
 
   if (tcp_result == nullptr || !tcp_result->success)
   {
-    fprintf(stdout, "%sTCP request to %s failed %s\n", RED, domain.c_str(), RESET);
+    fprintf(stdout, "%sTCP request to %s failed %s\n", RED, _domain.c_str(), RESET);
   }
   else
   {
-    fprintf(stdout, "%sTCP request to %s succeeded! %s\n", GRN, domain.c_str(), RESET);
+    fprintf(stdout, "%sTCP request to %s succeeded! %s\n", GRN, _domain.c_str(), RESET);
   }
 
   watch_task_result->tcp_result = tcp_result;
@@ -50,7 +55,7 @@ WatchTaskResult* WatchTask::_execute()
 
 void WatchTask::execute()
 {
-  printf("[DEBUG] WatchTask::execute %s\n", domain.c_str());
+  printf("[DEBUG] WatchTask::execute %s\n", _domain.c_str());
   auto* result = this->_execute();
   results.push_back(result);
   this->print_results();
@@ -58,7 +63,7 @@ void WatchTask::execute()
 
 void WatchTask::print_results()
 {
-  printf("--- %s ---\n", domain.c_str());
+  printf("--- %s ---\n", _domain.c_str());
   for (auto const& result : results)
   {
     if (result->icmp_result != nullptr)

@@ -40,7 +40,7 @@ public:
    * Zwraca true jeśli udaje się nawiązać połączenie z hostem i false w przeciwnym wypadku.
    * Metoda loguje w konsoli informacje o połączeniu.
    */
-  IcmpResult* execute_request(std::string &domain);
+  IcmpResult* execute_request(const std::string& domain);
 };
 
 #endif // NSFD_ICMP_ICMPCLIENT_H_

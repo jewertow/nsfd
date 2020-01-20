@@ -3,30 +3,30 @@
 #include <sstream>
 
 WatchServiceRequest::WatchServiceRequest(string& action, string& domain, string& port)
-  : action(action), domain(domain), port(port) {};
+  : _action(action), _domain(domain), _port(port) {};
 
 WatchServiceRequest::~WatchServiceRequest() = default;
 
-bool WatchServiceRequest::is_create_request()
+bool WatchServiceRequest::is_create_request() const
 {
-  return action == "create";
+  return _action == "create";
 }
 
-string WatchServiceRequest::get_domain()
+string WatchServiceRequest::domain() const
 {
-  return domain;
+  return _domain;
 }
 
-string WatchServiceRequest::get_port()
+string WatchServiceRequest::port() const
 {
-  return port;
+  return _port;
 }
 
-string WatchServiceRequest::to_string()
+string WatchServiceRequest::to_string() const
 {
   stringstream ss;
-  ss  << "action = " << this->action << endl
-      << "domain = " << this->domain << endl
-      << "port = " << this->port << endl;
+  ss << "action = " << this->_action << endl
+     << "domain = " << this->_domain << endl
+     << "port = " << this->_port << endl;
   return ss.str();
 }

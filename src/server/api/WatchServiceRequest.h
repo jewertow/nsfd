@@ -8,19 +8,18 @@ using namespace std;
 class WatchServiceRequest
 {
 private:
-  string action;
-  string domain;
-  string port;
+  const string _action;
+  const string _domain;
+  const string _port;
 
 public:
   WatchServiceRequest(string& action, string& domain, string& port);
   ~WatchServiceRequest();
 
-  bool is_create_request();
-  // TODO: Dostosować gettery do konwencji panujących w c++
-  string get_domain();
-  string get_port();
-  string to_string();
+  bool is_create_request() const;
+  string domain() const;
+  string port() const;
+  string to_string() const;
 };
 
 #endif // NSFD_SERVER_API_WATCHSERVICEREQUEST_H_
