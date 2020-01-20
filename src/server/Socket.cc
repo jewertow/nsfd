@@ -17,7 +17,7 @@ char* Socket::read_raw_message(int sock_fd)
   return raw_msg;
 }
 
-void Socket::write_and_close(int sock_fd, const std::string &msg)
+void Socket::write_and_close(int sock_fd, const std::string& msg)
 {
   if (write(sock_fd, msg.c_str(), msg.length()) < 0)
   {

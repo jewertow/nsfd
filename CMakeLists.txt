@@ -34,4 +34,9 @@ add_executable(nsfd-server
 		src/watch/WatchTaskStorage.cc
 		src/watch/WatchTaskFactory.h
 		src/watch/WatchTaskFactory.cc
-		src/util/CmdColor.h)
+		src/util/CmdColor.h
+		src/server/MetricsServer.h
+		src/server/MetricsServer.cc
+		src/server/api/MetricsRequest.h
+		src/server/api/MetricsRequestDeserializer.h
+		src/server/api/MetricsRequestDeserializer.cc)
