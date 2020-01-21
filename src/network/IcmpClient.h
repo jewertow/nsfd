@@ -20,18 +20,16 @@ struct IcmpResult
   long double rtt_ms;
 };
 
-// TODO: funkcje send_icmp i execute_request powinny być jedną funkcją
 class IcmpClient
 {
 private:
-  unsigned short checksum(void* bytes, int length);
+  // TODO: funkcje send_icmp i execute_request powinny być jedną funkcją
   IcmpResult* send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host);
   IcmpResult* failed_request();
+  unsigned short checksum(void* bytes, int length);
+  void fill_packet_with_random_data(char* packet_msg, int size);
+
 public:
-  /**
-   * Zwraca true jeśli udaje się nawiązać połączenie z hostem i false w przeciwnym wypadku.
-   * Metoda loguje w konsoli informacje o połączeniu.
-   */
   IcmpResult* execute_request(const std::string& domain);
 };
 

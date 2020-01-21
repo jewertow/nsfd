@@ -49,14 +49,8 @@ IcmpResult* IcmpClient::execute_request(const std::string& domain)
 
 IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host)
 {
-  int msg_count = 0;
-
   struct timespec time_start{};
   struct timespec time_end{};
-
-  struct timeval timeout{};
-  timeout.tv_sec = NSFD_ICMP_RECV_TIMEOUT;
-  timeout.tv_usec = 0;
 
   // SOL_IP - socket options level
   int ttl = 64;
@@ -66,6 +60,9 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
     return this->failed_request();
   }
 
+  struct timeval timeout{};
+  timeout.tv_sec = NSFD_ICMP_RECV_TIMEOUT;
+  timeout.tv_usec = 0;
   // setting timeout of recv setting
   if (setsockopt(raw_sock_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*) &timeout, sizeof timeout) < 0)
   {
@@ -76,18 +73,11 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   // TODO: do czyszczenia pakietu wykorzystac memset
   struct IcmpPacket packet{};
   bzero(&packet, sizeof(packet));
-
   packet.header.type = ICMP_ECHO;
   packet.header.un.echo.id = getpid();
+  packet.header.un.echo.sequence = 1;
+  fill_packet_with_random_data(packet.msg, sizeof(packet.msg));
 
-  // uzupelnienie tablicy msg losowymi danymi
-  for (int i = 0; i < sizeof(packet.msg); i++)
-  {
-    packet.msg[i] = i + '0';
-  }
-
-  packet.header.un.echo.sequence = msg_count++;
-  // TODO: poszukać gotową funkcję do sumy kontrolnej np w in_cksum.h
   packet.header.checksum = this->checksum(&packet, sizeof(packet));
 
   // send packet
@@ -101,7 +91,7 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   struct sockaddr_in src_addr{};
   int addr_len = sizeof(src_addr);
   ssize_t recv_res = recvfrom(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) &src_addr, (socklen_t*) &addr_len);
-  if (recv_res <= 0 && msg_count > 1)
+  if (recv_res <= 0)
   {
     printf("[ERROR] Could not receive ICMP packet.\n");
     return this->failed_request();
@@ -113,8 +103,8 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
     double time_ns = ((double) (time_end.tv_nsec - time_start.tv_nsec)) / 1000000.0;
     long double rtt = (long double) (time_end.tv_sec - time_start.tv_sec) * 1000.0 + time_ns;
 
-    printf("\033[32;1m%d bytes from hostname: %s, domain name: (%s) ip: (%s) msg_seq=%d ttl=%d rtt = %Lf ms.\n\033[0m",
-           NSFD_ICMP_PKT_SIZE, hostname, rev_host, ping_ip, msg_count, ttl, rtt);
+    printf("\033[32;1m%d bytes from hostname: %s, domain name: (%s) ip: (%s) ttl=%d rtt = %Lf ms.\n\033[0m",
+           NSFD_ICMP_PKT_SIZE, hostname, rev_host, ping_ip, ttl, rtt);
 
     return new IcmpResult{
       .success = true,
@@ -123,6 +113,7 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   }
 }
 
+// TODO: poszukać gotową funkcję do sumy kontrolnej np w in_cksum.h
 unsigned short IcmpClient::checksum(void* bytes, int len)
 {
   auto* buf = (unsigned short*) bytes;
@@ -145,4 +136,12 @@ IcmpResult* IcmpClient::failed_request()
   auto* result = new IcmpResult{};
   result->success = false;
   return result;
+}
+
+void IcmpClient::fill_packet_with_random_data(char* packet_msg, int size)
+{
+  for (int i = 0; i < size; i++)
+  {
+    packet_msg[i] = i + '0';
+  }
 }
