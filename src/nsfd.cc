@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   IcmpClient icmp_client;
   TcpClient tcp_client;
 
-  WatchTaskFactory factory(&icmp_client, &tcp_client);
+  WatchTaskFactory factory(&icmp_client, &tcp_client, 10);
   WatchTaskStorage storage;
 
   NsfdServer srv(5000, supervisor, &storage, &factory);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   MetricsServer metrics_server(5001, supervisor, &storage);
   metrics_server.run();
 
-  WatchServiceScheduler scheduler(&storage, supervisor);
+  WatchServiceScheduler scheduler(&storage, supervisor, 5);
   scheduler.run();
 
   string cmd;

@@ -9,10 +9,12 @@ class WatchServiceScheduler
 private:
   WatchTaskStorage* storage;
   ServerSupervisor* supervisor;
+  int sleep_s;
+
   void schedule();
 
 public:
-  WatchServiceScheduler(WatchTaskStorage*, ServerSupervisor*);
+  WatchServiceScheduler(WatchTaskStorage*, ServerSupervisor*, int sleep_s);
   ~WatchServiceScheduler() = default;
   void run();
 };

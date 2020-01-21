@@ -2,8 +2,8 @@
 #include <thread>
 #include <chrono>
 
-WatchServiceScheduler::WatchServiceScheduler(WatchTaskStorage* storage, ServerSupervisor* supervisor)
-  : storage(storage), supervisor(supervisor) {}
+WatchServiceScheduler::WatchServiceScheduler(WatchTaskStorage* storage, ServerSupervisor* supervisor, int sleep_s)
+  : storage(storage), supervisor(supervisor), sleep_s(sleep_s) {}
 
 void WatchServiceScheduler::run()
 {
@@ -21,6 +21,6 @@ void WatchServiceScheduler::schedule()
         std::thread t(&WatchTask::execute, task);
         t.detach();
     });
-    std::this_thread::sleep_for(std::chrono::seconds(15));
+    std::this_thread::sleep_for(std::chrono::seconds(this->sleep_s));
   }
 }

@@ -20,19 +20,21 @@ private:
   TcpClient* tcp_client;
   const std::string _domain;
   const int port;
-  std::mutex mutex;
+  const int results_size;
 
-  // TODO: Dostęp do wyników powinien być chroniony mutexem
+  std::mutex mutex;
   std::vector<WatchTaskResult*> results;
 
   // TODO: Zmienić nazwę na run()
   WatchTaskResult* _execute();
+  void compact_results();
+
   void print_results();
   long now();
 
 public:
   // TODO: Zmienić na const !!!
-  WatchTask(IcmpClient*, TcpClient*, std::string domain, int port);
+  WatchTask(IcmpClient*, TcpClient*, std::string domain, int port, int results_size);
   ~WatchTask();
 
   void execute();
