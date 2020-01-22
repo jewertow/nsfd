@@ -74,7 +74,8 @@ WatchTaskResult* WatchTask::_execute()
   if (icmp_result == nullptr || !icmp_result->success)
   {
     fprintf(stdout, "%sICMP request to %s failed %s\n", RED, _domain.c_str(), RESET);
-    watch_task_result->tcp_result = nullptr;
+    // TODO: Wstawiać nullptr, ale odpowiednio go obslużyć potem
+    watch_task_result->tcp_result = tcp_client->failed_result();
     return watch_task_result;
   }
   else
@@ -84,7 +85,7 @@ WatchTaskResult* WatchTask::_execute()
 
   auto* tcp_result = tcp_client->execute_request(_domain, port);
 
-  if (tcp_result == nullptr || !tcp_result->success)
+  if (!tcp_result->success)
   {
     fprintf(stdout, "%sTCP request to %s failed %s\n", RED, _domain.c_str(), RESET);
   }

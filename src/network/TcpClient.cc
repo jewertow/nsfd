@@ -64,8 +64,8 @@ TcpResult* TcpClient::execute_request(const std::string& addr, int port)
 
 TcpResult* TcpClient::failed_result()
 {
-  auto* failed = new TcpResult{};
-  failed->success = false;
-  failed->time = -1;
-  return failed;
+  return new TcpResult{
+    .success = false,
+    .time = -1
+  };
 }

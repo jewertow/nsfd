@@ -12,10 +12,9 @@ struct TcpResult
 // TODO: Metody zmienic na static
 class TcpClient
 {
-private:
-  TcpResult* failed_result();
 public:
   TcpResult* execute_request(const std::string& addr, int port);
+  TcpResult* failed_result();
 };
 
 #endif // NSFD_NETWORK_TCPCLIENT_H_
