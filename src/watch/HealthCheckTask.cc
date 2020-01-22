@@ -1,14 +1,14 @@
-#include "WatchTask.h"
+#include "HealthCheckTask.h"
 
 #include <utility>
 #include <sstream>
 #include <sys/time.h>
 #include "../util/CmdColor.h"
 
-WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port, int results_size)
+HealthCheckTask::HealthCheckTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port, int results_size)
   : icmp_client(icmp_client), tcp_client(tcp_client), _domain(std::move(domain)), port(port), results_size(results_size) {}
 
-WatchTask::~WatchTask()
+HealthCheckTask::~HealthCheckTask()
 {
   // TODO: mutex?
   for (auto& result : results)
@@ -18,10 +18,10 @@ WatchTask::~WatchTask()
   results.clear();
 }
 
-void WatchTask::execute()
+void HealthCheckTask::execute()
 {
   std::lock_guard<std::mutex> guard(mutex);
-  printf("[DEBUG] WatchTask::execute %s\n", _domain.c_str());
+  printf("[DEBUG] HealthCheckTask::execute %s\n", _domain.c_str());
   auto* result = this->_execute();
   results.push_back(result);
   // TODO: powinno to być konfigurowane jakąś zmienną globalną
@@ -29,12 +29,12 @@ void WatchTask::execute()
   this->compact_results();
 }
 
-std::string WatchTask::domain() const
+std::string HealthCheckTask::domain() const
 {
   return _domain;
 }
 
-std::string WatchTask::results_string()
+std::string HealthCheckTask::results_string()
 {
   std::lock_guard<std::mutex> guard(mutex);
   std::stringstream ss;
@@ -62,10 +62,10 @@ std::string WatchTask::results_string()
   return result;
 }
 
-WatchTaskResult* WatchTask::_execute()
+HealthCheckResult* HealthCheckTask::_execute()
 {
   long timestamp = now();
-  auto* watch_task_result = new WatchTaskResult{};
+  auto* watch_task_result = new HealthCheckResult{};
   watch_task_result->timestamp_ms = timestamp;
 
   auto* icmp_result = icmp_client->execute_request(this->_domain);
@@ -98,7 +98,7 @@ WatchTaskResult* WatchTask::_execute()
   return watch_task_result;
 }
 
-void WatchTask::print_results()
+void HealthCheckTask::print_results()
 {
   printf("--- %s ---\n", _domain.c_str());
   for (auto const& result : results)
@@ -117,7 +117,7 @@ void WatchTask::print_results()
   }
 }
 
-long WatchTask::now()
+long HealthCheckTask::now()
 {
   struct timeval timeval{};
   gettimeofday(&timeval, nullptr);
@@ -125,7 +125,7 @@ long WatchTask::now()
   return ms;
 }
 
-void WatchTask::compact_results()
+void HealthCheckTask::compact_results()
 {
   if (results.size() > (unsigned int) this->results_size)
   {

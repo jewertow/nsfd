@@ -8,8 +8,8 @@ add_executable(nsfd-server
         src/nsfd.cc
         src/server/SocketFactory.cc
         src/server/SocketFactory.h
-		src/server/NsfdServer.cc
-		src/server/NsfdServer.h
+        src/server/HealthCheckServer.cc
+        src/server/HealthCheckServer.h
 		src/server/TcpServer.cc
         src/server/TcpServer.h
 		src/server/Socket.cc
@@ -26,14 +26,14 @@ add_executable(nsfd-server
 		src/network/dns.cc
 		src/network/TcpClient.h
 		src/network/TcpClient.cc
-		src/watch/WatchTask.h
-		src/watch/WatchTask.cc
-		src/watch/WatchServiceScheduler.h
-		src/watch/WatchServiceScheduler.cc
-		src/watch/WatchTaskStorage.h
-		src/watch/WatchTaskStorage.cc
-		src/watch/WatchTaskFactory.h
-		src/watch/WatchTaskFactory.cc
+		src/watch/HealthCheckTask.h
+		src/watch/HealthCheckTask.cc
+		src/watch/HealthCheckTaskScheduler.h
+		src/watch/HealthCheckTaskScheduler.cc
+		src/watch/HealthCheckTaskStorage.h
+		src/watch/HealthCheckTaskStorage.cc
+		src/watch/HealthCheckTaskFactory.h
+		src/watch/HealthCheckTaskFactory.cc
 		src/util/CmdColor.h
 		src/server/MetricsServer.h
 		src/server/MetricsServer.cc

@@ -6,14 +6,14 @@
 #include "../network/IcmpClient.h"
 #include "../network/TcpClient.h"
 
-struct WatchTaskResult
+struct HealthCheckResult
 {
   IcmpResult* icmp_result;
   TcpResult* tcp_result;
   long timestamp_ms;
 };
 
-class WatchTask
+class HealthCheckTask
 {
 private:
   IcmpClient* icmp_client;
@@ -23,10 +23,10 @@ private:
   const int results_size;
 
   std::mutex mutex;
-  std::vector<WatchTaskResult*> results;
+  std::vector<HealthCheckResult*> results;
 
   // TODO: Zmienić nazwę na run()
-  WatchTaskResult* _execute();
+  HealthCheckResult* _execute();
   void compact_results();
 
   void print_results();
@@ -34,8 +34,8 @@ private:
 
 public:
   // TODO: Zmienić na const !!!
-  WatchTask(IcmpClient*, TcpClient*, std::string domain, int port, int results_size);
-  ~WatchTask();
+  HealthCheckTask(IcmpClient*, TcpClient*, std::string domain, int port, int results_size);
+  ~HealthCheckTask();
 
   void execute();
   std::string domain() const;

@@ -1,21 +1,21 @@
 #ifndef NSFD_WATCH_WATCHSERVICESCHEDULER_H_
 #define NSFD_WATCH_WATCHSERVICESCHEDULER_H_
 
-#include "WatchTaskStorage.h"
+#include "HealthCheckTaskStorage.h"
 #include "../server/ServerSupervisor.h"
 
-class WatchServiceScheduler
+class HealthCheckTaskScheduler
 {
 private:
-  WatchTaskStorage* storage;
+  HealthCheckTaskStorage* storage;
   ServerSupervisor* supervisor;
   int sleep_s;
 
   void schedule();
 
 public:
-  WatchServiceScheduler(WatchTaskStorage*, ServerSupervisor*, int sleep_s);
-  ~WatchServiceScheduler() = default;
+  HealthCheckTaskScheduler(HealthCheckTaskStorage*, ServerSupervisor*, int sleep_s);
+  ~HealthCheckTaskScheduler() = default;
   void run();
 };
 

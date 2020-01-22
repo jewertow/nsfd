@@ -3,10 +3,10 @@
 
 #include "../network/IcmpClient.h"
 #include "../network/TcpClient.h"
-#include "WatchTask.h"
+#include "HealthCheckTask.h"
 #include "../server/api/WatchServiceRequest.h"
 
-class WatchTaskFactory
+class HealthCheckTaskFactory
 {
 private:
   IcmpClient* icmp_client;
@@ -14,9 +14,9 @@ private:
   int results_size;
 
 public:
-  WatchTaskFactory(IcmpClient*, TcpClient*, int);
+  HealthCheckTaskFactory(IcmpClient*, TcpClient*, int);
 
-  WatchTask* create_watch_task(WatchServiceRequest*);
+  HealthCheckTask* create_watch_task(WatchServiceRequest*);
 };
 
 #endif // NSFD_WATCH_WATCHTASKFACTORY_H_
