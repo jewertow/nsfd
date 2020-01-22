@@ -5,8 +5,8 @@
 #include <sys/time.h>
 #include "../util/CmdColor.h"
 
-WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port)
-  : icmp_client(icmp_client), tcp_client(tcp_client), _domain(std::move(domain)), port(port) {}
+WatchTask::WatchTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port, int results_size)
+  : icmp_client(icmp_client), tcp_client(tcp_client), _domain(std::move(domain)), port(port), results_size(results_size) {}
 
 WatchTask::~WatchTask()
 {
@@ -24,7 +24,9 @@ void WatchTask::execute()
   printf("[DEBUG] WatchTask::execute %s\n", _domain.c_str());
   auto* result = this->_execute();
   results.push_back(result);
-  this->print_results();
+  // TODO: powinno to być konfigurowane jakąś zmienną globalną
+//  this->print_results();
+  this->compact_results();
 }
 
 std::string WatchTask::domain() const
@@ -72,7 +74,8 @@ WatchTaskResult* WatchTask::_execute()
   if (icmp_result == nullptr || !icmp_result->success)
   {
     fprintf(stdout, "%sICMP request to %s failed %s\n", RED, _domain.c_str(), RESET);
-    watch_task_result->tcp_result = nullptr;
+    // TODO: Wstawiać nullptr, ale odpowiednio go obslużyć potem
+    watch_task_result->tcp_result = tcp_client->failed_result();
     return watch_task_result;
   }
   else
@@ -82,7 +85,7 @@ WatchTaskResult* WatchTask::_execute()
 
   auto* tcp_result = tcp_client->execute_request(_domain, port);
 
-  if (tcp_result == nullptr || !tcp_result->success)
+  if (!tcp_result->success)
   {
     fprintf(stdout, "%sTCP request to %s failed %s\n", RED, _domain.c_str(), RESET);
   }
@@ -120,4 +123,15 @@ long WatchTask::now()
   gettimeofday(&timeval, nullptr);
   long ms = timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
   return ms;
+}
+
+void WatchTask::compact_results()
+{
+  if (results.size() > (unsigned int) this->results_size)
+  {
+    printf("Usuwanie ostatniego\n");
+    auto* oldest = results.front();
+    results.erase(results.begin());
+    delete oldest;
+  }
 }

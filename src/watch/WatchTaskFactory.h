@@ -11,9 +11,10 @@ class WatchTaskFactory
 private:
   IcmpClient* icmp_client;
   TcpClient* tcp_client;
+  int results_size;
 
 public:
-  WatchTaskFactory(IcmpClient*, TcpClient*);
+  WatchTaskFactory(IcmpClient*, TcpClient*, int);
 
   WatchTask* create_watch_task(WatchServiceRequest*);
 };

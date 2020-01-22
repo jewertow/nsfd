@@ -133,8 +133,10 @@ unsigned short IcmpClient::checksum(void* bytes, int len)
 
 IcmpResult* IcmpClient::failed_request()
 {
-  auto* result = new IcmpResult{};
-  result->success = false;
+  auto* result = new IcmpResult{
+    .success = false,
+    .rtt_ms = -1
+  };
   return result;
 }
 
