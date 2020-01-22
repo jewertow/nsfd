@@ -1,5 +1,5 @@
-#ifndef NSFD_WATCH_WATCHTASKSTORAGE_H_
-#define NSFD_WATCH_WATCHTASKSTORAGE_H_
+#ifndef NSFD_HEALTH_HEALTHCHECKTASKSTORAGE_H_
+#define NSFD_HEALTH_HEALTHCHECKTASKSTORAGE_H_
 
 #include <vector>
 #include <functional>
@@ -20,4 +20,4 @@ public:
   HealthCheckTask* get_by_domain(std::string& domain);
 };
 
-#endif // NSFD_WATCH_WATCHTASKSTORAGE_H_
+#endif // NSFD_HEALTH_HEALTHCHECKTASKSTORAGE_H_

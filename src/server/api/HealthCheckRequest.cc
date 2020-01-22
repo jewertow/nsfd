@@ -1,26 +1,26 @@
-#include "WatchServiceRequest.h"
+#include "HealthCheckRequest.h"
 
 #include <sstream>
 
-WatchServiceRequest::WatchServiceRequest(string& action, string& domain, string& port)
+HealthCheckRequest::HealthCheckRequest(string& action, string& domain, string& port)
   : _action(action), _domain(domain), _port(port) {};
 
-bool WatchServiceRequest::is_create_request() const
+bool HealthCheckRequest::is_create_request() const
 {
   return _action == "create";
 }
 
-string WatchServiceRequest::domain() const
+string HealthCheckRequest::domain() const
 {
   return _domain;
 }
 
-string WatchServiceRequest::port() const
+string HealthCheckRequest::port() const
 {
   return _port;
 }
 
-string WatchServiceRequest::to_string() const
+string HealthCheckRequest::to_string() const
 {
   stringstream ss;
   ss << "action = " << this->_action << endl

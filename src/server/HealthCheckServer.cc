@@ -1,7 +1,7 @@
 #include "HealthCheckServer.h"
 #include "Socket.h"
-#include "api/WatchServiceRequest.h"
-#include "api/WatchServiceRequestDeserializer.h"
+#include "api/HealthCheckRequest.h"
+#include "api/HealthCheckRequestDeserializer.h"
 
 HealthCheckServer::HealthCheckServer(int port, ServerSupervisor* supervisor, HealthCheckTaskStorage* storage, HealthCheckTaskFactory* factory)
   : TcpServer(port, supervisor), task_storage(storage), task_factory(factory) {}
@@ -11,7 +11,7 @@ void HealthCheckServer::on_connection(int client_sock, const string& client_addr
   printf("[DEBUG] Client ip %s. Socket fd: %d\n", client_addr.c_str(), client_sock);
 
   char* raw_msg = Socket::read_raw_message(client_sock);
-  WatchServiceRequest* request = WatchServiceRequestDeserializer::deserialize(raw_msg);
+  HealthCheckRequest* request = HealthCheckRequestDeserializer::deserialize(raw_msg);
 
   printf("[DEBUG] Deserialized request:\n%s\n", request->to_string().c_str());
 

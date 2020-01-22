@@ -1,10 +1,10 @@
-#ifndef NSFD_WATCH_WATCHTASKFACTORY_H_
-#define NSFD_WATCH_WATCHTASKFACTORY_H_
+#ifndef NSFD_HEALTH_HEALTHCHECKTASKFACTORY_H_
+#define NSFD_HEALTH_HEALTHCHECKTASKFACTORY_H_
 
 #include "../network/IcmpClient.h"
 #include "../network/TcpClient.h"
 #include "HealthCheckTask.h"
-#include "../server/api/WatchServiceRequest.h"
+#include "../server/api/HealthCheckRequest.h"
 
 class HealthCheckTaskFactory
 {
@@ -16,7 +16,7 @@ private:
 public:
   HealthCheckTaskFactory(IcmpClient*, TcpClient*, int);
 
-  HealthCheckTask* create_watch_task(WatchServiceRequest*);
+  HealthCheckTask* create_watch_task(HealthCheckRequest*);
 };
 
-#endif // NSFD_WATCH_WATCHTASKFACTORY_H_
+#endif // NSFD_HEALTH_HEALTHCHECKTASKFACTORY_H_

@@ -1,5 +1,5 @@
-#ifndef NSFD_WATCH_WATCHTASK_H_
-#define NSFD_WATCH_WATCHTASK_H_
+#ifndef NSFD_HEALTH_HEALTHCHECKTASK_H_
+#define NSFD_HEALTH_HEALTHCHECKTASK_H_
 
 #include <vector>
 #include <mutex>
@@ -42,4 +42,4 @@ public:
   std::string results_string();
 };
 
-#endif // NSFD_WATCH_WATCHTASK_H_
+#endif // NSFD_HEALTH_HEALTHCHECKTASK_H_

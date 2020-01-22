@@ -1,5 +1,5 @@
-#ifndef NSFD_WATCH_WATCHSERVICESCHEDULER_H_
-#define NSFD_WATCH_WATCHSERVICESCHEDULER_H_
+#ifndef NSFD_HEALTH_HEALTHCHECKTASKSCHEDULER_H_
+#define NSFD_HEALTH_HEALTHCHECKTASKSCHEDULER_H_
 
 #include "HealthCheckTaskStorage.h"
 #include "../server/ServerSupervisor.h"
@@ -19,4 +19,4 @@ public:
   void run();
 };
 
-#endif // NSFD_WATCH_WATCHSERVICESCHEDULER_H_
+#endif // NSFD_HEALTH_HEALTHCHECKTASKSCHEDULER_H_
