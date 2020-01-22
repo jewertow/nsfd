@@ -19,8 +19,6 @@ void TcpServer::start()
   {
     process_connections(client_addr, sock_size);
   }
-  printf("Server stopped\n");
-  exit(0);
 }
 
 void TcpServer::process_connections(sockaddr_in& client_addr, socklen_t& sock_size)

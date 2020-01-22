@@ -1,6 +1,6 @@
-#include "WatchTaskStorage.h"
+#include "HealthCheckTaskStorage.h"
 
-WatchTaskStorage::~WatchTaskStorage()
+HealthCheckTaskStorage::~HealthCheckTaskStorage()
 {
   // TODO: mutex?
   for (auto& task : tasks)
@@ -10,13 +10,13 @@ WatchTaskStorage::~WatchTaskStorage()
   tasks.clear();
 }
 
-void WatchTaskStorage::add_task(WatchTask* watch_task)
+void HealthCheckTaskStorage::add_task(HealthCheckTask* watch_task)
 {
   std::lock_guard<std::mutex> guard(mutex);
   tasks.push_back(watch_task);
 }
 
-void WatchTaskStorage::foreach(const std::function<void (WatchTask*)>& executor)
+void HealthCheckTaskStorage::foreach(const std::function<void (HealthCheckTask*)>& executor)
 {
   std::lock_guard<std::mutex> guard(mutex);
   for (auto const& task : tasks)
@@ -26,7 +26,7 @@ void WatchTaskStorage::foreach(const std::function<void (WatchTask*)>& executor)
   }
 }
 
-WatchTask* WatchTaskStorage::get_by_domain(std::string& domain)
+HealthCheckTask* HealthCheckTaskStorage::get_by_domain(std::string& domain)
 {
   std::lock_guard<std::mutex> guard(mutex);
   for (auto const& task : tasks)

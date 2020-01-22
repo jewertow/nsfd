@@ -1,7 +1,7 @@
-#include "WatchServiceRequestDeserializer.h"
+#include "HealthCheckRequestDeserializer.h"
 #include <string.h>
 
-WatchServiceRequest* WatchServiceRequestDeserializer::deserialize(char* raw_message)
+HealthCheckRequest* HealthCheckRequestDeserializer::deserialize(char* raw_message)
 {
   int i = 0;
   char* p = strtok(raw_message, ";");
@@ -17,5 +17,5 @@ WatchServiceRequest* WatchServiceRequestDeserializer::deserialize(char* raw_mess
   string domain(tokens[1]);
   string port(tokens[2]);
 
-  return new WatchServiceRequest(action, domain, port);
+  return new HealthCheckRequest(action, domain, port);
 }

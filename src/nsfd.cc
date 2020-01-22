@@ -1,8 +1,9 @@
-#include "server/NsfdServer.h"
+#include "server/HealthCheckServer.h"
 #include "network/IcmpClient.h"
 #include "network/TcpClient.h"
-#include "watch/WatchServiceScheduler.h"
+#include "health/HealthCheckTaskScheduler.h"
 #include "server/MetricsServer.h"
+#include "health/HealthCheckTaskFactory.h"
 #include <csignal>
 
 void stop(int);
@@ -14,24 +15,27 @@ ServerSupervisor* supervisor = new ServerSupervisor();
 int main(int argc, char *argv[])
 {
   signal(SIGINT, stop);
-  // FIXME: tymczasowe obejście na problem rzucania broken pipe przez sockety, dlaczego dokładnie się to dzieje?
+  // FIXME: tymczasowe obejście na problem rzucania broken pipe przez sockety
   signal(SIGPIPE, SIG_IGN);
 
-  supervisor->enable_server();
+  const int health_check_retention = 30;
+  const int health_check_sleep_s = 5;
 
   IcmpClient icmp_client;
   TcpClient tcp_client;
 
-  WatchTaskFactory factory(&icmp_client, &tcp_client, 10);
-  WatchTaskStorage storage;
+  HealthCheckTaskStorage storage;
+  HealthCheckTaskFactory factory(&icmp_client, &tcp_client, health_check_retention);
 
-  NsfdServer srv(5000, supervisor, &storage, &factory);
-  srv.run();
+  supervisor->enable_server();
+
+  HealthCheckServer health_check_server(5000, supervisor, &storage, &factory);
+  health_check_server.run();
 
   MetricsServer metrics_server(5001, supervisor, &storage);
   metrics_server.run();
 
-  WatchServiceScheduler scheduler(&storage, supervisor, 5);
+  HealthCheckTaskScheduler scheduler(&storage, supervisor, health_check_sleep_s);
   scheduler.run();
 
   string cmd;
@@ -39,16 +43,15 @@ int main(int argc, char *argv[])
       cin >> cmd;
   } while (cmd != "stop");
 
-  printf("Stopping server....\n");
+  printf("Stop servers...\n");
   supervisor->disable_server();
   delete supervisor;
-
   exit(EXIT_SUCCESS);
 }
 
 void stop(int)
 {
-  printf("Stopping server...\n");
+  printf("Stop server...\n");
   supervisor->disable_server();
   delete supervisor;
   exit(EXIT_SUCCESS);
