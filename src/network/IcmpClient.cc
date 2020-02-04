@@ -1,6 +1,5 @@
 #include "IcmpClient.h"
 #include "dns.h"
-
 #include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
@@ -14,24 +13,17 @@ IcmpResult* IcmpClient::execute_request(const std::string& domain)
 {
   struct sockaddr_in addr_con{};
 
-  char* ip_addr = resolve_dns((char*) domain.c_str(), &addr_con);
-  if (ip_addr == nullptr)
+  std::string ip_addr = resolve_dns((char*) domain.c_str(), &addr_con);
+  if (ip_addr.empty())
   {
     printf("\nDNS lookup failed! Could not resolve hostname!\n");
     return this->failed_request();
   }
 
-  char* hostname = reverse_dns(ip_addr);
-  if (hostname != nullptr)
-  {
-    printf("[DEBUG] received hostname %s for ip %s", hostname, ip_addr);
-  }
-  else
-  {
-    return this->failed_request();
-  }
+  std::string hostname = reverse_dns((char*) ip_addr.c_str());
+  printf("[DEBUG] received hostname %s for ip %s\n", hostname.c_str(), ip_addr.c_str());
 
-  printf("[DEBUG] Connecting to '%s' IP: %s\n", domain.c_str(), ip_addr);
+  printf("[DEBUG] Connecting to '%s' IP: %s\n", domain.c_str(), ip_addr.c_str());
   int raw_sock_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if (raw_sock_fd < 0)
   {
@@ -39,15 +31,10 @@ IcmpResult* IcmpClient::execute_request(const std::string& domain)
     return this->failed_request();
   }
 
-  auto* icmp_result = send_icmp(raw_sock_fd, &addr_con, hostname, ip_addr, (char*) domain.c_str());
-
-  free(hostname);
-  free(ip_addr);
-  
-  return icmp_result;
+  return send_icmp(raw_sock_fd, &addr_con, (char*) hostname.c_str(), (char*) ip_addr.c_str(), (char*) domain.c_str());
 }
 
-IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host)
+IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* dest_ip, char* domain_name)
 {
   struct timespec time_start{};
   struct timespec time_end{};
@@ -56,17 +43,16 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   int ttl = 64;
   if (setsockopt(raw_sock_fd, SOL_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
   {
-    fprintf(stdout, "[ERROR] Setting TTL failed\n");
+    fprintf(stdout, "[ERROR] Setting TTL failed (domain: %s)\n", domain_name);
     return this->failed_request();
   }
 
   struct timeval timeout{};
   timeout.tv_sec = NSFD_ICMP_RECV_TIMEOUT;
   timeout.tv_usec = 0;
-  // setting timeout of recv setting
   if (setsockopt(raw_sock_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*) &timeout, sizeof timeout) < 0)
   {
-    fprintf(stdout, "[ERROR] Setting socket timeout failed\n");
+    fprintf(stdout, "[ERROR] Setting socket timeout failed (domain: %s)\n", domain_name);
     return this->failed_request();
   }
 
@@ -84,7 +70,7 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   clock_gettime(CLOCK_MONOTONIC, &time_start);
   if (sendto(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) dest_addr, sizeof(*dest_addr)) == -1)
   {
-    printf("[ERROR] Could not send ICMP packet.\n");
+    printf("[ERROR] Could not send ICMP packet to %s\n", domain_name);
     return failed_request();
   }
 
@@ -93,7 +79,7 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
   ssize_t recv_res = recvfrom(raw_sock_fd, &packet, sizeof(packet), 0, (struct sockaddr*) &src_addr, (socklen_t*) &addr_len);
   if (recv_res <= 0)
   {
-    printf("[ERROR] Could not receive ICMP packet.\n");
+    printf("[ERROR] Could not receive ICMP packet from %s\n", domain_name);
     return this->failed_request();
   }
   else
@@ -104,7 +90,7 @@ IcmpResult* IcmpClient::send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr
     long double rtt = (long double) (time_end.tv_sec - time_start.tv_sec) * 1000.0 + time_ns;
 
     printf("\033[32;1m%d bytes from hostname: %s, domain name: (%s) ip: (%s) ttl=%d rtt = %Lf ms.\n\033[0m",
-           NSFD_ICMP_PKT_SIZE, hostname, rev_host, ping_ip, ttl, rtt);
+           NSFD_ICMP_PKT_SIZE, hostname, domain_name, dest_ip, ttl, rtt);
 
     return new IcmpResult{
       .success = true,
