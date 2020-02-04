@@ -24,7 +24,7 @@ class IcmpClient
 {
 private:
   // TODO: funkcje send_icmp i execute_request powinny być jedną funkcją
-  IcmpResult* send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* ping_ip, char* rev_host);
+  IcmpResult* send_icmp(int raw_sock_fd, struct sockaddr_in* dest_addr, char* hostname, char* dest_ip, char* domain_name);
   IcmpResult* failed_request();
   unsigned short checksum(void* bytes, int length);
   void fill_packet_with_random_data(char* packet_msg, int size);
