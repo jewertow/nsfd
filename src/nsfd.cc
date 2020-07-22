@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
 
   supervisor->enable_server();
 
-  HealthCheckServer health_check_server(5000, supervisor, &storage, &factory);
+  HealthCheckServer health_check_server(8000, supervisor, &storage, &factory);
   health_check_server.run();
 
-  MetricsServer metrics_server(5001, supervisor, &storage);
+  MetricsServer metrics_server(8001, supervisor, &storage);
   metrics_server.run();
 
   HealthCheckTaskScheduler scheduler(&storage, supervisor, health_check_sleep_s);
