@@ -1,9 +1,9 @@
 #ifndef NSFD_SERVER_HEALTHCHECKSERVER_H_
 #define NSFD_SERVER_HEALTHCHECKSERVER_H_
 
-#include "TcpServer.h"
-#include "../health/HealthCheckTaskStorage.h"
-#include "../health/HealthCheckTaskFactory.h"
+#include "tcp_server.h"
+#include "../health/health_check_task_storage.h"
+#include "../health/health_check_task_factory.h"
 
 class HealthCheckServer : public TcpServer
 {

@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <mutex>
-#include "../network/IcmpClient.h"
-#include "../network/TcpClient.h"
+#include "../network/icmp_client.h"
+#include "../network/tcp_client.h"
 
 struct HealthCheckResult
 {

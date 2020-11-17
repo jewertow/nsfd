@@ -1,4 +1,4 @@
-#include "HealthCheckRequest.h"
+#include "health_check_request.h"
 
 #include <sstream>
 

@@ -1,10 +1,10 @@
 #ifndef NSFD_HEALTH_HEALTHCHECKTASKFACTORY_H_
 #define NSFD_HEALTH_HEALTHCHECKTASKFACTORY_H_
 
-#include "../network/IcmpClient.h"
-#include "../network/TcpClient.h"
-#include "HealthCheckTask.h"
-#include "../server/api/HealthCheckRequest.h"
+#include "../network/icmp_client.h"
+#include "../network/tcp_client.h"
+#include "health_check_task.h"
+#include "../server/api/health_check_request.h"
 
 class HealthCheckTaskFactory
 {

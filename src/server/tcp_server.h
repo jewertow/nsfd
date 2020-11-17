@@ -5,8 +5,8 @@
 #include <thread>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "ServerSupervisor.h"
-#include "SocketFactory.h"
+#include "server_supervisor.h"
+#include "socket_factory.h"
 
 using namespace std;
 

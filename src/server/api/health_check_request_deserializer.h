@@ -1,7 +1,7 @@
 #ifndef NSFD_SERVER_API_HEALTHCHECKREQUESTDESERIALIZER_H_
 #define NSFD_SERVER_API_HEALTHCHECKREQUESTDESERIALIZER_H_
 
-#include "HealthCheckRequest.h"
+#include "health_check_request.h"
 
 class HealthCheckRequestDeserializer
 {
