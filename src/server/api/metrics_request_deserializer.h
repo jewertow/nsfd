@@ -1,7 +1,7 @@
 #ifndef NSFD_SERVER_API_METRICSREQUESTDESERIALIZER_H_
 #define NSFD_SERVER_API_METRICSREQUESTDESERIALIZER_H_
 
-#include "MetricsRequest.h"
+#include "metrics_request.h"
 
 class MetricsRequestDeserializer
 {

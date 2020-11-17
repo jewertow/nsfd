@@ -1,4 +1,4 @@
-#include "HealthCheckRequestDeserializer.h"
+#include "health_check_request_deserializer.h"
 #include <string.h>
 
 HealthCheckRequest* HealthCheckRequestDeserializer::deserialize(char* raw_message)

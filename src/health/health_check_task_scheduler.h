@@ -1,8 +1,8 @@
 #ifndef NSFD_HEALTH_HEALTHCHECKTASKSCHEDULER_H_
 #define NSFD_HEALTH_HEALTHCHECKTASKSCHEDULER_H_
 
-#include "HealthCheckTaskStorage.h"
-#include "../server/ServerSupervisor.h"
+#include "health_check_task_storage.h"
+#include "../server/server_supervisor.h"
 
 class HealthCheckTaskScheduler
 {

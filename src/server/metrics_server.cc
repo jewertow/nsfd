@@ -1,6 +1,6 @@
-#include "MetricsServer.h"
-#include "Socket.h"
-#include "api/MetricsRequestDeserializer.h"
+#include "metrics_server.h"
+#include "socket.h"
+#include "api/metrics_request_deserializer.h"
 
 MetricsServer::MetricsServer(int port, ServerSupervisor* supervisor, HealthCheckTaskStorage* storage)
   : TcpServer(port, supervisor), task_storage(storage) {}

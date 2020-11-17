@@ -1,9 +1,9 @@
-#include "server/HealthCheckServer.h"
-#include "network/IcmpClient.h"
-#include "network/TcpClient.h"
-#include "health/HealthCheckTaskScheduler.h"
-#include "server/MetricsServer.h"
-#include "health/HealthCheckTaskFactory.h"
+#include "server/health_check_server.h"
+#include "network/icmp_client.h"
+#include "network/tcp_client.h"
+#include "health/health_check_task_scheduler.h"
+#include "server/metrics_server.h"
+#include "health/health_check_task_factory.h"
 #include <csignal>
 
 void stop(int);

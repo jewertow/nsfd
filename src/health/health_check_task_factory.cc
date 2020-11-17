@@ -1,4 +1,4 @@
-#include "HealthCheckTaskFactory.h"
+#include "health_check_task_factory.h"
 
 HealthCheckTaskFactory::HealthCheckTaskFactory(IcmpClient* icmp_client, TcpClient* tcp_client, int results_size)
   : icmp_client(icmp_client), tcp_client(tcp_client), results_size(results_size) {}

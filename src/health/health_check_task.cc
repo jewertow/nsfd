@@ -1,9 +1,9 @@
-#include "HealthCheckTask.h"
+#include "health_check_task.h"
 
 #include <utility>
 #include <sstream>
 #include <sys/time.h>
-#include "../util/CmdColor.h"
+#include "../util/cmd_colors.h"
 
 HealthCheckTask::HealthCheckTask(IcmpClient* icmp_client, TcpClient* tcp_client, std::string domain, int port, int results_size)
   : icmp_client(icmp_client), tcp_client(tcp_client), _domain(std::move(domain)), port(port), results_size(results_size) {}

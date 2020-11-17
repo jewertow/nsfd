@@ -1,4 +1,4 @@
-#include "IcmpClient.h"
+#include "icmp_client.h"
 #include "dns.h"
 #include <netinet/in.h>
 #include <string.h>

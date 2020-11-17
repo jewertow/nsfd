@@ -1,7 +1,7 @@
-#include "HealthCheckServer.h"
-#include "Socket.h"
-#include "api/HealthCheckRequest.h"
-#include "api/HealthCheckRequestDeserializer.h"
+#include "health_check_server.h"
+#include "socket.h"
+#include "api/health_check_request.h"
+#include "api/health_check_request_deserializer.h"
 
 HealthCheckServer::HealthCheckServer(int port, ServerSupervisor* supervisor, HealthCheckTaskStorage* storage, HealthCheckTaskFactory* factory)
   : TcpServer(port, supervisor), task_storage(storage), task_factory(factory) {}
