@@ -14,7 +14,7 @@ class TcpClient
 {
 public:
   TcpResult* execute_request(const std::string& addr, int port);
-  TcpResult* failed_result();
+  static TcpResult* failed_result();
 };
 
 #endif // NSFD_NETWORK_TCPCLIENT_H_

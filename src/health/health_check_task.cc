@@ -10,9 +10,7 @@ HealthCheckTask::HealthCheckTask(IcmpClient* icmp_client, TcpClient* tcp_client,
 
 HealthCheckTask::~HealthCheckTask()
 {
-  // TODO: mutex?
-  for (auto& result : results)
-  {
+  for (auto& result : results) {
     delete result;
   }
   results.clear();
@@ -21,11 +19,8 @@ HealthCheckTask::~HealthCheckTask()
 void HealthCheckTask::execute()
 {
   std::lock_guard<std::mutex> guard(mutex);
-  printf("[DEBUG] HealthCheckTask::execute %s\n", _domain.c_str());
-  auto* result = this->_execute();
+  auto* result = this->execute_task();
   results.push_back(result);
-  // TODO: powinno to być konfigurowane jakąś zmienną globalną
-//  this->print_results();
   this->compact_results();
 }
 
@@ -38,8 +33,7 @@ std::string HealthCheckTask::results_string()
 {
   std::lock_guard<std::mutex> guard(mutex);
   std::stringstream ss;
-  for (auto& result : results)
-  {
+  for (auto& result : results) {
     ss  << "|"
         << result->icmp_result->success
         << ";"
@@ -53,8 +47,7 @@ std::string HealthCheckTask::results_string()
   }
 
   auto result = ss.str();
-  if (result.length() > 0)
-  {
+  if (result.length() > 0) {
     // remove first character "|"
     result.erase(0, 1);
   }
@@ -62,7 +55,7 @@ std::string HealthCheckTask::results_string()
   return result;
 }
 
-HealthCheckResult* HealthCheckTask::_execute()
+HealthCheckResult* HealthCheckTask::execute_task()
 {
   long timestamp = now();
   auto* watch_task_result = new HealthCheckResult{};
@@ -71,50 +64,23 @@ HealthCheckResult* HealthCheckTask::_execute()
   auto* icmp_result = icmp_client->execute_request(this->_domain);
   watch_task_result->icmp_result = icmp_result;
 
-  if (icmp_result == nullptr || !icmp_result->success)
-  {
-    fprintf(stdout, "%sICMP request to %s failed %s\n", RED, _domain.c_str(), RESET);
-    // TODO: Wstawiać nullptr, ale odpowiednio go obslużyć potem
+  if (icmp_result == nullptr || !icmp_result->success) {
+    printf("%sICMP request to %s failed%s\n", RED, _domain.c_str(), RESET);
     watch_task_result->tcp_result = tcp_client->failed_result();
     return watch_task_result;
-  }
-  else
-  {
-    fprintf(stdout, "%sICMP request to %s succeeded! %s\n", GRN, _domain.c_str(), RESET);
+  } else {
+    printf("%sICMP request to %s succeeded%s\n", GRN, _domain.c_str(), RESET);
   }
 
   auto* tcp_result = tcp_client->execute_request(_domain, port);
-
-  if (!tcp_result->success)
-  {
-    fprintf(stdout, "%sTCP request to %s failed %s\n", RED, _domain.c_str(), RESET);
-  }
-  else
-  {
-    fprintf(stdout, "%sTCP request to %s succeeded! %s\n", GRN, _domain.c_str(), RESET);
+  if (!tcp_result->success) {
+    printf("%sTCP request to %s failed%s\n", RED, _domain.c_str(), RESET);
+  } else {
+    printf("%sTCP request to %s succeeded%s\n", GRN, _domain.c_str(), RESET);
   }
 
   watch_task_result->tcp_result = tcp_result;
   return watch_task_result;
-}
-
-void HealthCheckTask::print_results()
-{
-  printf("--- %s ---\n", _domain.c_str());
-  for (auto const& result : results)
-  {
-    if (result->icmp_result != nullptr)
-    {
-      printf("icmp success = %d\n", result->icmp_result->success);
-      printf("icmp time = %Lf\n", result->icmp_result->rtt_ms);
-    }
-    if (result->tcp_result != nullptr)
-    {
-      printf("tcp success = %d\n", result->tcp_result->success);
-      printf("tcp time = %Lf\n", result->tcp_result->time);
-    }
-    printf("Timestamp = %ld\n", result->timestamp_ms);
-  }
 }
 
 long HealthCheckTask::now()
@@ -127,9 +93,7 @@ long HealthCheckTask::now()
 
 void HealthCheckTask::compact_results()
 {
-  if (results.size() > (unsigned int) this->results_size)
-  {
-    printf("Usuwanie ostatniego\n");
+  if (results.size() > (unsigned int) this->results_size) {
     auto* oldest = results.front();
     results.erase(results.begin());
     delete oldest;

@@ -1,9 +1,6 @@
 #ifndef NSFD_UTIL_CMDCOLOR_H_
 #define NSFD_UTIL_CMDCOLOR_H_
 
-#define GREEN_PREFIX "\033[32;1m"
-#define GREEN_SUFFIX "\033[0m"
-
 #define RED   "\x1B[31;1m"
 #define GRN   "\x1B[32;1m"
 #define YEL   "\x1B[33m"

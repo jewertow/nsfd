@@ -8,14 +8,12 @@
 
 void stop(int);
 
-// FIXME: Wysłanie 1000 żądań powoduj błąd zbyt dużej liczby otwartych deskryptorów plików
-// FIXME: IDE podswietla
 ServerSupervisor* supervisor = new ServerSupervisor();
 
 int main(int argc, char *argv[])
 {
   signal(SIGINT, stop);
-  // FIXME: tymczasowe obejście na problem rzucania broken pipe przez sockety
+  // FIXME: temporary workaround for broken pipes on sockets
   signal(SIGPIPE, SIG_IGN);
 
   const int health_check_retention = 30;
@@ -43,16 +41,18 @@ int main(int argc, char *argv[])
       cin >> cmd;
   } while (cmd != "stop");
 
-  printf("Stop servers...\n");
+  printf("Stopping server...\n");
   supervisor->disable_server();
   delete supervisor;
+
   exit(EXIT_SUCCESS);
 }
 
 void stop(int)
 {
-  printf("Stop server...\n");
+  printf("Stopping server...\n");
   supervisor->disable_server();
   delete supervisor;
+
   exit(EXIT_SUCCESS);
 }

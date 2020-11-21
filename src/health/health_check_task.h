@@ -25,15 +25,12 @@ private:
   std::mutex mutex;
   std::vector<HealthCheckResult*> results;
 
-  // TODO: Zmienić nazwę na run()
-  HealthCheckResult* _execute();
+  HealthCheckResult* execute_task();
   void compact_results();
 
-  void print_results();
   long now();
 
 public:
-  // TODO: Zmienić na const !!!
   HealthCheckTask(IcmpClient*, TcpClient*, std::string domain, int port, int results_size);
   ~HealthCheckTask();
 

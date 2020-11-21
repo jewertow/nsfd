@@ -8,18 +8,15 @@ HealthCheckServer::HealthCheckServer(int port, ServerSupervisor* supervisor, Hea
 
 void HealthCheckServer::on_connection(int client_sock, const string& client_addr)
 {
-  printf("[DEBUG] Client ip %s. Socket fd: %d\n", client_addr.c_str(), client_sock);
+  fprintf(stdout, "Connection from IP %s [socket fd=%d]\n", client_addr.c_str(), client_sock);
 
   char* raw_msg = Socket::read_raw_message(client_sock);
   HealthCheckRequest* request = HealthCheckRequestDeserializer::deserialize(raw_msg);
 
-  printf("[DEBUG] Deserialized request:\n%s\n", request->to_string().c_str());
+  fprintf(stdout, "Deserialized request:\n%s\n", request->to_string().c_str());
 
-  if (request->is_create_request())
-  {
-    fprintf(stdout, "[INFO] Dodanie zadania dla domeny %s i portu %s\n",
-            request->domain().c_str(), request->port().c_str());
-
+  if (request->is_create_request()) {
+    fprintf(stdout, "Creating a health check task for %s:%s\n", request->domain().c_str(), request->port().c_str());
     auto* watch_task = task_factory->create_watch_task(request);
     task_storage->add_task(watch_task);
   }

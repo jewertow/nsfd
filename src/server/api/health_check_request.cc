@@ -25,6 +25,6 @@ string HealthCheckRequest::to_string() const
   stringstream ss;
   ss << "action = " << this->_action << endl
      << "domain = " << this->_domain << endl
-     << "port = " << this->_port << endl;
+     << "port = "   << this->_port   << endl;
   return ss.str();
 }

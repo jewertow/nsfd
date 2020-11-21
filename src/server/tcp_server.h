@@ -15,7 +15,7 @@ class TcpServer
 protected:
   int port;
   ServerSupervisor* supervisor;
-  // TODO: Trzeba zamknąć ten socket w dekonstruktorze albo dodać metodę close(), którą trzeba jawnie wywołać
+  // TODO: close socket and release fd in destructor
   int srv_sock_fd;
 
   virtual void on_connection(int client_sock_fd, const std::string& client_addr) = 0;
@@ -28,8 +28,6 @@ protected:
 
 public:
   void run();
-
 };
-
 
 #endif // NSFD_SERVER_TCPSERVER_H_

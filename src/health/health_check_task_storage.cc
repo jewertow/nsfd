@@ -2,9 +2,7 @@
 
 HealthCheckTaskStorage::~HealthCheckTaskStorage()
 {
-  // TODO: mutex?
-  for (auto& task : tasks)
-  {
+  for (auto& task : tasks) {
     delete task;
   }
   tasks.clear();
@@ -19,9 +17,8 @@ void HealthCheckTaskStorage::add_task(HealthCheckTask* watch_task)
 void HealthCheckTaskStorage::foreach(const std::function<void (HealthCheckTask*)>& executor)
 {
   std::lock_guard<std::mutex> guard(mutex);
-  for (auto const& task : tasks)
-  {
-    printf("[DEBUG] Executing task for domain: %s\n", task->domain().c_str());
+  for (auto const& task : tasks) {
+    printf("Executing task for domain: %s\n", task->domain().c_str());
     executor(task);
   }
 }
@@ -29,10 +26,8 @@ void HealthCheckTaskStorage::foreach(const std::function<void (HealthCheckTask*)
 HealthCheckTask* HealthCheckTaskStorage::get_by_domain(std::string& domain)
 {
   std::lock_guard<std::mutex> guard(mutex);
-  for (auto const& task : tasks)
-  {
-    if (task->domain() == domain)
-    {
+  for (auto const& task : tasks) {
+    if (task->domain() == domain) {
       return task;
     }
   }

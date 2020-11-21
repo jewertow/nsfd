@@ -7,8 +7,7 @@ HealthCheckRequest* HealthCheckRequestDeserializer::deserialize(char* raw_messag
   char* p = strtok(raw_message, ";");
   char* tokens[3];
 
-  while (p != nullptr)
-  {
+  while (p != nullptr) {
     tokens[i++] = p;
     p = strtok (nullptr, ";");
   }
